@@ -33,7 +33,7 @@ cnt = 0
 	--read from file in str
 	str = mfile:read(size)
 	for w in str:gmatch("%w+") do coords[#coords+1] = w end 
-	pge.font.print(verdana12, 10, 10, white, coords[5])
+	pge.font.print(verdana12, 10, 10, white, 'Size coords = ' ..#coords)
 	-- End drawing
 	pge.gfx.enddrawing()
 	-- Swap buffers
@@ -67,33 +67,45 @@ function print_info()
 	pge.font.print(verdana12, 55, 18, white, y)
 end
 
+logfile=pge.file.open("log.txt", PGE_FILE_RDWR)
+
+function draw_part(a, b, c)
+	pge.gfx.startdrawing()
+	k=a
+	tmp=a+c
+	ky=b+40
+	kx=130
+	cnt=0
+	while k<tmp do
+		if cnt==300 then
+			ky=ky+1
+			kx=130
+			cnt=0
+		end	
+		if string.format('%d', coords[k])==string.format('%d', 1) then
+			pge.gfx.drawline(kx,ky,kx+1,ky,mColor)
+		end
+		cnt=cnt+1
+		kx=kx+1
+		k=k+1
+	end
+	pge.gfx.enddrawing()	
+end
+
 -- draw global map
 function draw_global_map()
-	i=1
-	kx=0
-	ky=0
-	cnt=1
-	k_old=0
 	
-	while coords[i] do
-		
-		ky=i/300
-		-- it means that we have a new line
-		if (ky~=k_old) then
-			kx = 0
-		end	
-		k_old=ky
-		-- draw oint if we have a 1 in map
-		if coords[i]==1 then
-			pge.gfx.drawline(kx,ky,kx,ky,mapColor)
-		end
-			
-			i = i + 1
-	end
-
+		draw_part(1, 0, 19800)
+		draw_part(19801, 66, 20100)
+		draw_part(39901 ,133, 20100)
+	
+	pge.gfx.swapbuffers()
 end
--- enf of drawing global map
+
+
+	
 draw_global_map()
+
 
 -- main cycle
 while pge.running() do
@@ -101,14 +113,19 @@ while pge.running() do
 	-- Update controls
 	pge.controls.update()
 	pge.gfx.startdrawing()
-	--pge.gfx.clearscreen()
-	
+	pge.gfx.clearscreen()
+
 	-- draw circle 
-	pge.gfx.drawcircle(x, y, 3, 10, mColor)
+	pge.gfx.drawcircle(x, y, 3, 10, mapColor)
 	-- call func
 	print_info()
 	-- call func to change cursor coords
 	move_circle()
+	
+	-- if R_TRIGGER pressed, repaint main map
+	--if pge.controls.pressed(PGE_CTRL_RTRIGGER) then
+	--draw_global_map()
+	--end
 	
 	-- If START pressed, end
 	if pge.controls.pressed(PGE_CTRL_START) then
