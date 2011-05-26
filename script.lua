@@ -1,5 +1,5 @@
 -- Load the font
-verdana12 = pge.font.load("verdana.ttf", 10, PGE_RAM)
+verdana12 = pge.font.load("verdana.ttf", 12, PGE_RAM)
 verdana12:activate()
 
 -- Check the font loaded correctly
@@ -61,13 +61,10 @@ end
 
 -- function that print additional information, such as current coords
 function print_info()
-	pge.font.print(verdana12, 10, 10, white, "x coord:")
-	pge.font.print(verdana12, 55, 10, white, x)
-	pge.font.print(verdana12, 10, 18, white, "y coord:")
-	pge.font.print(verdana12, 55, 18, white, y)
+	pge.font.print(verdana12, 20, 10, white, "x coord: "..x)
+	pge.font.print(verdana12, 20, 25, white, "y coord: "..y)
 end
 
-logfile=pge.file.open("log.txt", PGE_FILE_RDWR)
 
 function draw_part(a, b, c)
 	pge.gfx.startdrawing()
@@ -101,9 +98,13 @@ function draw_global_map()
 	
 	pge.gfx.swapbuffers()
 end
+function send_coords()
 
 
-	
+
+end
+
+-- print global map	
 draw_global_map()
 
 
@@ -113,19 +114,26 @@ while pge.running() do
 	-- Update controls
 	pge.controls.update()
 	pge.gfx.startdrawing()
-	pge.gfx.clearscreen()
-
+	--pge.gfx.clearscreen()
+	
 	-- draw circle 
-	pge.gfx.drawcircle(x, y, 3, 10, mapColor)
-	-- call func
+	pge.gfx.drawcircle(x, y, 2, 10, mapColor)
+	-- call func about coords
 	print_info()
 	-- call func to change cursor coords
 	move_circle()
 	
 	-- if R_TRIGGER pressed, repaint main map
-	--if pge.controls.pressed(PGE_CTRL_RTRIGGER) then
-	--draw_global_map()
-	--end
+	if pge.controls.pressed(PGE_CTRL_RTRIGGER) then
+		draw_global_map()
+	end
+	if pge.controls.pressed(PGE_CTRL_LTRIGGER) then
+		pge.gfx.clearscreen()
+	end
+	-- send via wifi new coords
+	if pge.controls.pressed(PGE_CTRL_LTRIGGER) then
+		send_coords()
+	end
 	
 	-- If START pressed, end
 	if pge.controls.pressed(PGE_CTRL_START) then
